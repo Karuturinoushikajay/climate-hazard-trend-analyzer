@@ -1,0 +1,1 @@
+"""Static region catalog."""

@@ -1,0 +1,35 @@
+services:
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: ./backend
+    ports:
+      - "8765:8000"
+    environment:
+      MONGO_URI: mongodb://mongo:27017
+      MONGO_DB: climate_hazard
+      STORE_PREFERENCE: mongo
+      CORS_ORIGINS: http://localhost:43123,http://127.0.0.1:43123
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  web:
+    build: ./frontend
+    ports:
+      - "43123:80"
+    depends_on:
+      - api
+
+volumes:
+  mongo_data:

@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     mongo_db: str = "climate_hazard"
     store_preference: str = "auto"
     data_dir: str = str(BACKEND_ROOT / "data")
-    cors_origins: str = "http://localhost:43123,http://127.0.0.1:43123"
+    cors_origins: str = "http://localhost:43123,http://127.0.0.1:43123,https://climate-hazard-trend-analyzer.vercel.app"
     trust_proxy: bool = False
     open_meteo_archive_url: str = "https://archive-api.open-meteo.com/v1/archive"
     open_meteo_geocode_url: str = "https://geocoding-api.open-meteo.com/v1/search"

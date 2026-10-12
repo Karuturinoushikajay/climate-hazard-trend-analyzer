@@ -10,6 +10,7 @@ the same for both.
 from __future__ import annotations
 
 import logging
+import tempfile
 import threading
 from pathlib import Path
 from typing import Protocol
@@ -107,7 +108,13 @@ def create_store(settings: Settings | None = None) -> DocumentStore:
             logger.warning("MongoDB is not reachable (%s). Using the TinyDB document store.", exc.__class__.__name__)
     path = Path(settings.data_dir) / "documents.json"
     logger.info("Using TinyDB document store at %s", path)
-    return TinyStore(path)
+    try:
+        return TinyStore(path)
+    except OSError as exc:
+        # Read-only filesystems (serverless hosts) only allow writes under /tmp.
+        fallback = Path(tempfile.gettempdir()) / "climate-hazard" / "documents.json"
+        logger.warning("Cannot write to %s (%s). Using %s instead.", path, exc.__class__.__name__, fallback)
+        return TinyStore(fallback)
 
 
 def get_store() -> DocumentStore:
